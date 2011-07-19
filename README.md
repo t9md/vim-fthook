@@ -5,8 +5,8 @@ provide very simple filetype hook facility.
 purpose
 ----------------------------------
 ### ensure your favorite keymap is always available
-Overwite keymap plugin defined with your keymap.
-For example, I use following keymap to move between windows.
+Overwite keymap plugin defined with your keymap.  
+For example, I use following keymap to move between windows.  
 
     nnoremap <silent> <C-h> :wincmd h<CR>
     nnoremap <silent> <C-l> :wincmd l<CR>
@@ -14,22 +14,21 @@ For example, I use following keymap to move between windows.
     nnoremap <silent> <C-j> :wincmd j<CR>
 
 with this keymap, I can move window to window with `<C-hlkj>`
-But sometime, plugin I installed overwrite one of these keymap.
-To ensure `<C-hlkj>` combination is always available, set buffer local
-keymap after plugin have set up their keymap.
-This could be done with `autocmd Filetype` but setup this autocmd each
-time I install new plugin is nonsense.
+But sometime, plugin I installed overwrite one of these keymap.  
+To ensure `<C-hlkj>` combination is always available, set buffer local keymap after plugin have set up their keymap.  
+This could be done with `autocmd Filetype` but setup this autocmd each time I install new plugin is nonsense.  
 
-To do that, refer configuration example
+To do that, refer configuration example  
 
 ## simplify filetype specific setting
 
 # Configuration example
-`g:fthook` is dictionary of
+`g:fthook` is dictionary of  
+
 * key: `&filetype` but '-' is translated to '_'
 * value: function which is called at `autocmd Filetype` event
 
-the key '_' is special filetype which is always called, means `global`.
+the key '_' is special filetype which is always called, means `global`.  
 
     let g:fthook = {}
     function! g:fthook._()
