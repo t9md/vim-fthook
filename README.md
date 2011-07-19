@@ -13,7 +13,7 @@ For example, I use following keymap to move between windows.
     nnoremap <silent> <C-k> :wincmd k<CR>
     nnoremap <silent> <C-j> :wincmd j<CR>
 
-with this keymap, I can move window to window with `<C-hlkj>`
+with this keymap, I can move window to window with `<C-hlkj>`  
 But sometime, plugin I installed overwrite one of these keymap.  
 To ensure `<C-hlkj>` combination is always available, set buffer local keymap after plugin have set up their keymap.  
 This could be done with `autocmd Filetype` but setup this autocmd each time I install new plugin is nonsense.  
