@@ -23,7 +23,8 @@ function! s:call_hook()"{{{
     call g:fthook._()
     let ft = tr(&filetype, '-' , '_')
     if type(get(g:fthook, ft, -1)) == 2
-        call g:fthook[ft]()
+        let s:F = g:fthook[ft]
+        call call(s:F, [], g:fthook)
     endif
 endfunction"}}}
 augroup fthook "{{{
