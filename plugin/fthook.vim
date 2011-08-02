@@ -25,6 +25,7 @@ function! s:call_hook()"{{{
     if type(get(g:fthook, ft, -1)) == 2
         let s:F = g:fthook[ft]
         call call(s:F, [], g:fthook)
+        unlet s:F
     endif
 endfunction"}}}
 augroup fthook "{{{
