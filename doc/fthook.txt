@@ -1,0 +1,122 @@
+*fthook.txt* simplify filetype specific setting.
+						      
+Version: 0.2
+Author : t9md <taqumd@gmail.com>
+GitHub : https://github.com/t9md/vim-fthook
+==============================================================================
+CONTENTS					*fthook-contents*
+
+Introduction				    |fthook-introduction|
+Mapping					    |fthook-mapping|
+Commands				    |fthook-commands|
+Variables				    |fthook-variables|
+Configuration Examples			    |fthook-examples|
+Bug     				    |fthook-bug|
+Changelog				    |fthook-changelog|
+
+==============================================================================
+INTRODUCTION				      	*fthook-introduction*
+
+*fthook.vim* provide very simple filetype hook facility.
+Each |FileType| event, filetype specific fook function is called.
+
+Puprpose~
+Ensure my favorite keymap is always available by overwriting plugin-defined
+keymap with my buffer local keymap.
+
+I know this plugin is not perfect solution, but I think this still useful.
+
+Practical usecase~
+For example, I use following keymap to move between windows.  
+>
+    nnoremap <silent> <C-h> :wincmd h<CR>
+    nnoremap <silent> <C-l> :wincmd l<CR>
+    nnoremap <silent> <C-k> :wincmd k<CR>
+    nnoremap <silent> <C-j> :wincmd j<CR>
+<
+
+With this keymap, I can move window to window with <C-hlkj>.
+But sometime, plugin I installed overwrite one of these keymap.  
+To ensure `<C-hlkj>` combination is always available, set buffer local keymap 
+after plugin have set up their keymap.  
+This could be done with `autocmd Filetype`, but setup this autocmd each time I
+install new plugin is nonsense.  
+
+To do that, refer |fthook-examples|.
+
+==============================================================================
+MAPPINGS					*fthook-mappings*
+
+==============================================================================
+COMMANDS						*fthook-commands*
+
+==============================================================================
+VARIABLES						*fthook-variables*
+
+g:fthook
+	directory which you define filetype specific hook.
+        Default~
+        {}
+
+	{key} is the |&filetype| but "-"(hyphen) is translated 
+	to "_" underscore.
+		
+	{value} is the function called for associated |FileType| event.
+
+==============================================================================
+CONFIGURATION EXAMPLE					*fthook-examples*
+>
+    let g:fthook = {}
+
+    function! g:fthook._()
+	" ensure move cursor between windows with <C-hlkj> unless
+	" &filetype is 'nerdtree'
+	if &ft != 'nerdtree'
+	    nnoremap <buffer> <silent> <C-h> :wincmd h<CR>
+	    nnoremap <buffer> <silent> <C-l> :wincmd l<CR>
+	    nnoremap <buffer> <silent> <C-k> :wincmd k<CR>
+	    nnoremap <buffer> <silent> <C-j> :wincmd j<CR>
+	endif
+    endfunction
+
+    function! g:fthook.help() "{{{
+      nnoremap <buffer> <Return> <C-]>
+      nnoremap <buffer> <BS>     <C-t>
+      nnoremap <buffer> .j  /\|[^ \|]\+\|<CR>
+    endfunction "}}}
+
+    function! g:fthook.ruby() "{{{
+      compiler ruby
+      noremap  <buffer> <silent> <F5> moHmt:%call Xmpfilter()<CR>'tzt`o
+      inoremap <buffer> <silent> <F5> <Esc>moHmt:%call Xmpfilter()<CR>'tzt`oa
+      noremap  <buffer> <silent> <F4> :call XmpCommentToggle()<CR>
+      inoremap <buffer> <silent> <F4> <C-o>:call XmpCommentToggle()<CR>
+
+      noremap  <buffer> <silent> <M-r> moHmt:%call Xmpfilter()<CR>'tzt`o
+      inoremap <buffer> <silent> <M-r> <Esc>moHmt:%call Xmpfilter()<CR>'tzt`oa
+      vnoremap <buffer> <silent> <M-r> :call Xmpfilter()<CR>
+      noremap  <buffer> <silent> <M-m> :call XmpCommentToggle()<CR>
+      inoremap <buffer> <silent> <M-m> <C-o>:call XmpCommentToggle()<CR>
+      map <buffer> <M-j>   <Plug>BlockToggle
+      call OverwiteRubyFindFileMapping()
+    endfunction "}}}
+
+    function! g:fthook.nerdtree() "{{{
+	nmap <buffer> v go
+	nnoremap <silent> <buffer>  f    :call <SID>normal_other("80j")<CR>
+	nnoremap <silent> <buffer>  b    :call <SID>normal_other("80k")<CR>
+	nnoremap <silent> <buffer>  ~    :<C-u>exe 'NERDTree'.expand("$HOME")<CR>
+	nnoremap <silent> <buffer>  'g    :<C-u>NERDTreeFromBookmark gems<CR>
+	nnoremap <silent> <buffer>  'b    :<C-u>NERDTreeFromBookmark vimbundle<CR>
+	nnoremap <silent> <buffer>  'v    :<C-u>NERDTreeFromBookmark vim<CR>
+    endfunction "}}}
+<
+==============================================================================
+BUG							*fthook-bug*
+
+==============================================================================
+CHANGELOG						*fthook-changelog*
+2011-08-21: v0.2
+	- initial release to vim.org
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
