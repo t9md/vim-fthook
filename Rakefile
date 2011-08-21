@@ -15,7 +15,7 @@ task :versub do
   files.delete('doc/tags')
   files.each do |fname|
     lines = File.readlines(fname)
-    lines.map! { |l| l.sub(/Version: 0.2
+    lines.map! { |l| l.sub(/Version: (.*)/, "Version: #{version}") }
     File.open(fname,'w') {|f| f.puts lines }
   end
 end
