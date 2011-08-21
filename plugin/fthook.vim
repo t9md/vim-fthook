@@ -19,19 +19,20 @@ set cpo&vim
 if !exists('g:fthook') || type(g:fthook) != 4
     let g:fthook = {}
 endif
-function! s:call_hook()"{{{
+function! s:call_hook() "{{{
     call g:fthook._()
     let ft = tr(&filetype, '-' , '_')
     if type(get(g:fthook, ft, -1)) == 2
-        let s:F = g:fthook[ft]
-        call call(s:F, [], g:fthook)
-        unlet s:F
+        let F = g:fthook[ft]
+        call call(F, [], g:fthook)
+        unlet F
     endif
-endfunction"}}}
+endfunction "}}}
+
 augroup fthook "{{{
     autocmd!
     autocmd! FileType * call s:call_hook()
-augroup END"}}}
+augroup END "}}}
 
 " FINISH: {{{1
 "============================================================
