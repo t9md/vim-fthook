@@ -116,7 +116,10 @@ BUG							*fthook-bug*
 
 ==============================================================================
 CHANGELOG						*fthook-changelog*
+2011-08-22: v0.3
+	- no functionality change. fix zip archiveing mistake.
 2011-08-21: v0.2
 	- initial release to vim.org
+
 ==============================================================================
 vim:tw=78:ts=8:ft=help:norl:
