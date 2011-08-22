@@ -1,6 +1,6 @@
 *fthook.txt* simplify filetype specific setting.
 						      
-Version: 0.2
+Version: 0.3
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-fthook
 ==============================================================================
