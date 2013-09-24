@@ -1,7 +1,6 @@
 "=============================================================================
 " File: fthook.vim
 " Author: t9md <taqumd@gmail.com>
-" Version: 0.3
 " WebPage: https://github.com/t9md/vim-fthook
 " License: BSD
 
