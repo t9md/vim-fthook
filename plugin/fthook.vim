@@ -22,12 +22,12 @@ endif
 
 function! s:call_hook() "{{{
     if type(get(g:fthook, "_", -1)) == 2
-      call call(g:fthook["_"], [], g:fthook)
+      call call(g:fthook["_"], [], {})
     endif
 
     let ft_underscore = tr(&filetype, '-' , '_')
     if type(get(g:fthook, ft_underscore, -1)) == 2
-      call call(g:fthook[ft_underscore], [], g:fthook)
+      call call(g:fthook[ft_underscore], [], {})
     endif
 endfunction "}}}
 
