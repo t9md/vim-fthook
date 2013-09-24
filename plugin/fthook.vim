@@ -19,13 +19,15 @@ set cpo&vim
 if !exists('g:fthook') || type(g:fthook) != 4
     let g:fthook = {}
 endif
+
 function! s:call_hook() "{{{
-    call g:fthook._()
-    let ft = tr(&filetype, '-' , '_')
-    if type(get(g:fthook, ft, -1)) == 2
-        let F = g:fthook[ft]
-        call call(F, [], g:fthook)
-        unlet F
+    if type(get(g:fthook, "_", -1)) == 2
+      call call(g:fthook["_"], [], g:fthook)
+    endif
+
+    let ft_underscore = tr(&filetype, '-' , '_')
+    if type(get(g:fthook, ft_underscore, -1)) == 2
+      call call(g:fthook[ft_underscore], [], g:fthook)
     endif
 endfunction "}}}
 

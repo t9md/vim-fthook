@@ -1,6 +1,6 @@
 *fthook.txt* simplify filetype specific setting.
 						      
-Version: 0.3
+Version: 0.4
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-fthook
 ==============================================================================
@@ -116,6 +116,8 @@ BUG							*fthook-bug*
 
 ==============================================================================
 CHANGELOG						*fthook-changelog*
+2013-09-24: v0.4
+	- Fix bug when default key('_') is not defined.
 2011-08-22: v0.3
 	- no functionality change. fix zip archiveing mistake.
 2011-08-21: v0.2
