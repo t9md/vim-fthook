@@ -1,41 +1,50 @@
-"=============================================================================
-" File: fthook.vim
-" Author: t9md <taqumd@gmail.com>
-" WebPage: https://github.com/t9md/vim-fthook
-" License: BSD
-
-" GUARD: {{{1
-"============================================================
+" Guard:
 if exists('g:loaded_fthook')
   finish
 endif
+
 let g:loaded_fthook = 1
 let s:old_cpo = &cpo
 set cpo&vim
 
-" MAIN: {{{1
-"============================================================
-if !exists('g:fthook') || type(g:fthook) != 4
-    let g:fthook = {}
-endif
+" Main:
+let s:options = {
+      \ 'g:fthook' : {},
+      \ }
 
-function! s:call_hook() "{{{
-    if type(get(g:fthook, "_", -1)) == 2
-      call call(g:fthook["_"], [], {})
+function! s:set_options(options) "{{{
+  for [varname, value] in items(a:options)
+    if !exists(varname)
+      let {varname} = value
     endif
+    unlet value
+  endfor
+endfunction "}}}
+call s:set_options(s:options)
 
-    let ft_underscore = tr(&filetype, '-' , '_')
-    if type(get(g:fthook, ft_underscore, -1)) == 2
-      call call(g:fthook[ft_underscore], [], {})
-    endif
+function! s:call_hook(afile, amatch) "{{{
+  let context = { 'afile' : a:afile, 'amatch': a:amatch }
+
+  if exists('*g:fthook._')
+    call g:fthook._(context)
+  endif
+
+  let ft_underscore = tr(&filetype, '-' , '_')
+
+  if exists('*g:fthook.' . ft_underscore)
+    call g:fthook[ft_underscore](context)
+  endif
+
+  " if type(get(g:fthook, ft_underscore, -1)) == 2
+    " call g:fthook[ft_underscore](context)
+  " endif
 endfunction "}}}
 
-augroup fthook "{{{
-    autocmd!
-    autocmd! FileType * call s:call_hook()
+augroup plugin-fthook "{{{
+  autocmd!
+  autocmd! FileType * call s:call_hook(expand('<afile>'), expand('<amatch>'))
+  " autocmd! BufReadPost * call s:call_hook(expand('<afile>'), expand('<amatch>'))
 augroup END "}}}
 
-" FINISH: {{{1
-"============================================================
 let &cpo = s:old_cpo
-" vim: set sw=4 sts=4 et fdm=marker fdc=3 fdl=3:
+" vim: foldmethod=marker

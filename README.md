@@ -31,7 +31,7 @@ To do that, refer configuration example
 the key '_' is special filetype which is always called, means `global`.  
 
     let g:fthook = {}
-    function! g:fthook._()
+    function! g:fthook._(_)
         " ensure move cursor between windows with <C-hlkj> unless
         " &filetype is 'nerdtree'
         if &ft != 'nerdtree'
@@ -41,12 +41,12 @@ the key '_' is special filetype which is always called, means `global`.
             nnoremap <buffer> <silent> <C-j> :wincmd j<CR>
         endif
     endfunction
-    function! g:fthook.help()"{{{
+    function! g:fthook.help(_)"{{{
       nnoremap <buffer> <Return> <C-]>
       nnoremap <buffer> <BS>     <C-t>
       nnoremap <buffer> .j  /\|[^ \|]\+\|<CR>
     endfunction"}}}
-    function! g:fthook.ruby()"{{{
+    function! g:fthook.ruby(_)"{{{
       compiler ruby
       noremap  <buffer> <silent> <F5> moHmt:%call Xmpfilter()<CR>'tzt`o
       inoremap <buffer> <silent> <F5> <Esc>moHmt:%call Xmpfilter()<CR>'tzt`oa
@@ -61,7 +61,7 @@ the key '_' is special filetype which is always called, means `global`.
       map <buffer> <M-j>   <Plug>BlockToggle
       call OverwiteRubyFindFileMapping()
     endfunction"}}}
-    function! g:fthook.nerdtree()"{{{
+    function! g:fthook.nerdtree(_)"{{{
         nmap <buffer> v go
         nnoremap <silent> <buffer>  f    :call <SID>normal_other("80j")<CR>
         nnoremap <silent> <buffer>  b    :call <SID>normal_other("80k")<CR>
@@ -70,10 +70,10 @@ the key '_' is special filetype which is always called, means `global`.
         nnoremap <silent> <buffer>  'b    :<C-u>NERDTreeFromBookmark vimbundle<CR>
         nnoremap <silent> <buffer>  'v    :<C-u>NERDTreeFromBookmark vim<CR>
     endfunction"}}}
-    function! g:fthook.lingr_messages()"{{{
+    function! g:fthook.lingr_messages(_)"{{{
         nmap <buffer> i <Plug>(lingr-messages-show-say-buffer) 
     endfunction"}}}
-    function! g:fthook.unite() "{{{
+    function! g:fthook.unite(_) "{{{
         nmap <buffer>m       <Plug>(unite_toggle_mark_current_candidate)
         vmap <buffer>m       <Plug>(unite_toggle_mark_selected_candidates)
         imap <buffer> <C-g>  <Plug>(unite_exit)
@@ -109,7 +109,7 @@ the key '_' is special filetype which is always called, means `global`.
         nnoremap <silent> <buffer> <expr> <C-o> unite#do_action('open')
         nnoremap <silent><buffer><expr> u unite#do_action('persist_open')
     endfunction  "}}}
-    function! g:fthook.vimshell() "{{{
+    function! g:fthook.vimshell(_) "{{{
         inoremap <buffer><silent> <C-p> <C-o>:<C-u>Unite file_mru -buffer-name=files<CR>
         call vimshell#altercmd#define('g', 'git')
         call vimshell#altercmd#define('i', 'iexe')
