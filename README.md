@@ -4,6 +4,7 @@ provide very simple filetype hook.
 It's simpliyies your `.vimrc` like
 
 * before
+
 ```Vim
 augroup my_augroup
   autocmd!
@@ -13,6 +14,7 @@ augroup END
 ```
 
 * after
+
 ```Vim
 let g:fthook = {}
 function! g:fthook.ruby(_) "{{{
