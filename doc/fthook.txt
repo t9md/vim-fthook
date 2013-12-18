@@ -1,14 +1,12 @@
 *fthook.txt* simplify filetype specific setting.
 						      
-Version: 0.4
+Version: 0.5
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-fthook
 ==============================================================================
 CONTENTS					*fthook-contents*
 
 Introduction				    |fthook-introduction|
-Mapping					    |fthook-mapping|
-Commands				    |fthook-commands|
 Variables				    |fthook-variables|
 Configuration Examples			    |fthook-examples|
 Bug     				    |fthook-bug|
@@ -17,105 +15,149 @@ Changelog				    |fthook-changelog|
 ==============================================================================
 INTRODUCTION				      	*fthook-introduction*
 
-*fthook.vim* provide very simple filetype hook facility.
-Each |FileType| event, filetype specific fook function is called.
+provide very simple filetype hook.
+It's simpliyies your `.vimrc` like
 
-Puprpose~
-Ensure my favorite keymap is always available by overwriting plugin-defined
-keymap with my buffer local keymap.
-
-I know this plugin is not perfect solution, but I think this still useful.
-
-Practical usecase~
-For example, I use following keymap to move between windows.  
->
-    nnoremap <silent> <C-h> :wincmd h<CR>
-    nnoremap <silent> <C-l> :wincmd l<CR>
-    nnoremap <silent> <C-k> :wincmd k<CR>
-    nnoremap <silent> <C-j> :wincmd j<CR>
+* before >
+ augroup my_augroup
+   autocmd!
+   autocmd FileType ruby setlocal ts=2 sts=2 sw=2 expandtab
+   " many many FileType configuration follow below
+ augroup END
 <
 
-With this keymap, I can move window to window with <C-hlkj>.
-But sometime, plugin I installed overwrite one of these keymap.  
-To ensure `<C-hlkj>` combination is always available, set buffer local keymap 
-after plugin have set up their keymap.  
-This could be done with `autocmd Filetype`, but setup this autocmd each time I
-install new plugin is nonsense.  
+* after >
+ let g:fthook = {}
+ function! g:fthook.ruby(_) "{{{
+   setlocal ts=2 sts=2 sw=2 expandtab
+ endfunction
+<
+Puprpose~
+One of my favorite maping in `.vimrc` is bellow
+>
+ nnoremap <silent> <C-h> :wincmd h<CR>
+ nnoremap <silent> <C-l> :wincmd l<CR>
+ nnoremap <silent> <C-k> :wincmd k<CR>
+ nnoremap <silent> <C-j> :wincmd j<CR>
+<
 
-To do that, refer |fthook-examples|.
+With this mapping I can move around windows with CONTROL + hjkl, but
+occasionally some plugin overwite one of these mapping with their own buffer
+local key mapping.
 
-==============================================================================
-MAPPINGS					*fthook-mappings*
+So, to ensure CONTROL + hjkl is always avaiable, I need to re-map with bufer
+local mapping.
 
-==============================================================================
-COMMANDS						*fthook-commands*
+This plugin help you in these situation.
+See |fthook-examples|
 
 ==============================================================================
 VARIABLES						*fthook-variables*
 
-g:fthook
-	directory which you define filetype specific hook.
-        Default~
-        {}
+*g:fthook*
+        Default: {}
 
-	{key} is the |&filetype| but "-"(hyphen) is translated 
-	to "_" underscore.
-		
-	{value} is the function called for associated |FileType| event.
+	|Dictionary| for filetype specific hook.
 
+	{key}:   |&filetype| with '-'(hyphen) translated '_'.
+		'_' is special key, always called before filetype siecific
+		function is called.
+	{value}: function called when associated |FileType| event triggered.
+
+	Function take one {context} argument like bellow
+>
+	{
+	\  'afile': value of `expand('<afile>')`,
+	\  'amatch': value of `expand('<amatch>')`
+	\  }
+<
 ==============================================================================
 CONFIGURATION EXAMPLE					*fthook-examples*
 >
-    let g:fthook = {}
-
-    function! g:fthook._()
-	" ensure move cursor between windows with <C-hlkj> unless
-	" &filetype is 'nerdtree'
-	if &ft != 'nerdtree'
-	    nnoremap <buffer> <silent> <C-h> :wincmd h<CR>
-	    nnoremap <buffer> <silent> <C-l> :wincmd l<CR>
-	    nnoremap <buffer> <silent> <C-k> :wincmd k<CR>
-	    nnoremap <buffer> <silent> <C-j> :wincmd j<CR>
-	endif
-    endfunction
-
-    function! g:fthook.help() "{{{
-      nnoremap <buffer> <Return> <C-]>
-      nnoremap <buffer> <BS>     <C-t>
-      nnoremap <buffer> .j  /\|[^ \|]\+\|<CR>
-    endfunction "}}}
-
-    function! g:fthook.ruby() "{{{
-      compiler ruby
-      noremap  <buffer> <silent> <F5> moHmt:%call Xmpfilter()<CR>'tzt`o
-      inoremap <buffer> <silent> <F5> <Esc>moHmt:%call Xmpfilter()<CR>'tzt`oa
-      noremap  <buffer> <silent> <F4> :call XmpCommentToggle()<CR>
-      inoremap <buffer> <silent> <F4> <C-o>:call XmpCommentToggle()<CR>
-
-      noremap  <buffer> <silent> <M-r> moHmt:%call Xmpfilter()<CR>'tzt`o
-      inoremap <buffer> <silent> <M-r> <Esc>moHmt:%call Xmpfilter()<CR>'tzt`oa
-      vnoremap <buffer> <silent> <M-r> :call Xmpfilter()<CR>
-      noremap  <buffer> <silent> <M-m> :call XmpCommentToggle()<CR>
-      inoremap <buffer> <silent> <M-m> <C-o>:call XmpCommentToggle()<CR>
-      map <buffer> <M-j>   <Plug>BlockToggle
-      call OverwiteRubyFindFileMapping()
-    endfunction "}}}
-
-    function! g:fthook.nerdtree() "{{{
-	nmap <buffer> v go
-	nnoremap <silent> <buffer>  f    :call <SID>normal_other("80j")<CR>
-	nnoremap <silent> <buffer>  b    :call <SID>normal_other("80k")<CR>
-	nnoremap <silent> <buffer>  ~    :<C-u>exe 'NERDTree'.expand("$HOME")<CR>
-	nnoremap <silent> <buffer>  'g    :<C-u>NERDTreeFromBookmark gems<CR>
-	nnoremap <silent> <buffer>  'b    :<C-u>NERDTreeFromBookmark vimbundle<CR>
-	nnoremap <silent> <buffer>  'v    :<C-u>NERDTreeFromBookmark vim<CR>
-    endfunction "}}}
+ let g:fthook = {}
+ function! g:fthook._(_)
+   " ensure move cursor between windows with <C-hlkj> unless
+   " &filetype is 'nerdtree'
+   if &ft != 'nerdtree'
+     nnoremap <buffer> <silent> <C-h> :wincmd h<CR>
+     nnoremap <buffer> <silent> <C-l> :wincmd l<CR>
+     nnoremap <buffer> <silent> <C-k> :wincmd k<CR>
+     nnoremap <buffer> <silent> <C-j> :wincmd j<CR>
+   endif
+ endfunction
+ 
+ function! g:fthook.help(_)
+   nnoremap <buffer> <Return> <C-]>
+   nnoremap <buffer> <BS>     <C-t>
+   nnoremap <buffer> .j  /\|[^ \|]\+\|<CR>
+ endfunction
+ 
+ function! g:fthook.ruby(_)
+   compiler ruby
+   noremap  <buffer> <silent> <F5> moHmt:%call Xmpfilter()<CR>'tzt`o
+   inoremap <buffer> <silent> <F5> <Esc>moHmt:%call Xmpfilter()<CR>'tzt`oa
+   noremap  <buffer> <silent> <F4> :call XmpCommentToggle()<CR>
+   inoremap <buffer> <silent> <F4> <C-o>:call XmpCommentToggle()<CR>
+ 
+   noremap  <buffer> <silent> <M-r> moHmt:%call Xmpfilter()<CR>'tzt`o
+   inoremap <buffer> <silent> <M-r> <Esc>moHmt:%call Xmpfilter()<CR>'tzt`oa
+   vnoremap <buffer> <silent> <M-r> :call Xmpfilter()<CR>
+   noremap  <buffer> <silent> <M-m> :call XmpCommentToggle()<CR>
+   inoremap <buffer> <silent> <M-m> <C-o>:call XmpCommentToggle()<CR>
+   map <buffer> <M-j>   <Plug>BlockToggle
+   call OverwiteRubyFindFileMapping()
+ endfunction
+ 
+ function! g:fthook.nerdtree(_)
+   nmap <buffer> v go
+   nnoremap <silent> <buffer>  f    :call <SID>normal_other("80j")<CR>
+   nnoremap <silent> <buffer>  b    :call <SID>normal_other("80k")<CR>
+   nnoremap <silent> <buffer>  ~    :<C-u>exe 'NERDTree'.expand("$HOME")<CR>
+   nnoremap <silent> <buffer>  'g    :<C-u>NERDTreeFromBookmark gems<CR>
+   nnoremap <silent> <buffer>  'b    :<C-u>NERDTreeFromBookmark vimbundle<CR>
+   nnoremap <silent> <buffer>  'v    :<C-u>NERDTreeFromBookmark vim<CR>
+ endfunction
+ 
+ function! g:fthook.unite(_)
+   nmap <buffer>m       <Plug>(unite_toggle_mark_current_candidate)
+   vmap <buffer>m       <Plug>(unite_toggle_mark_selected_candidates)
+   imap <buffer> <C-g>  <Plug>(unite_exit)
+   nmap <buffer> <C-g>  <Plug>(unite_exit)
+   imap <buffer> <C-e>     <Plug>(unite_narrowing_path)
+   nmap <buffer> <C-e>     <Plug>(unite_narrowing_path)
+   nmap <buffer> <C-z>  <Plug>(unite_toggle_transpose_window)
+   imap <buffer> <C-z>  <Plug>(unite_toggle_transpose_window)
+   nmap <silent> <buffer> <M-j>  <Plug>(unite_rotate_next_source)
+   nmap <silent> <buffer> <M-k>  <Plug>(unite_rotate_previous_source)
+ 
+   nnoremap <silent> <buffer> <expr> B    unite#do_action('bookmark')
+   nnoremap <silent> <buffer>  f    :call <SID>normal_other("80j")<CR>
+   nnoremap <silent> <buffer>  b    :call <SID>normal_other("80k")<CR>
+   nnoremap <silent> <buffer>  J    :call <SID>normal_other("_C-e")<CR>
+   nnoremap <silent> <buffer>  K    :call <SID>normal_other("\<C-y>")<CR>
+   nnoremap <silent> <buffer>  zR   :call <SID>normal_other("zR")<CR>
+   nnoremap <silent> <buffer>  zM   :call <SID>normal_other("zM")<CR>
+   nnoremap <silent> <buffer> <expr> <C-j> unite#do_action('below')
+   inoremap <silent> <buffer> <expr> <C-j> unite#do_action('below')
+   nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('right')
+   inoremap <silent> <buffer> <expr> <C-l> unite#do_action('right')
+ 
+   inoremap <silent> <buffer> <expr> H unite#do_action('vimshell')
+   nnoremap <silent> <buffer> <expr> H unite#do_action('vimshell')
+ 
+   nnoremap <silent> <buffer> <expr>     r <Plug>(unite_redraw)
+   inoremap <silent> <buffer> <expr> <C-o> unite#do_action('open')
+   nnoremap <silent> <buffer> <expr> <C-o> unite#do_action('open')
+   nnoremap <silent><buffer><expr> u unite#do_action('persist_open')
+ endfunction
 <
 ==============================================================================
 BUG							*fthook-bug*
 
 ==============================================================================
 CHANGELOG						*fthook-changelog*
+2013-12-18: v0.5
+	- disasterous change, add context argument for each hook function.
 2013-09-24: v0.4
 	- Fix bug when default key('_') is not defined.
 2011-08-22: v0.3
